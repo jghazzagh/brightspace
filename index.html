@@ -653,6 +653,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <span class="status-pill" id="jsStatus">JavaScript loading...</span>
       <button class="btn secondary small" type="button" id="resetBtn">Reset</button>
     </div>
   </header>
@@ -1282,7 +1283,8 @@ Submit your work before the deadline.</textarea>
       code: document.getElementById("codeOutput"),
       copyBtn: document.getElementById("copyBtn"),
       downloadBtn: document.getElementById("downloadBtn"),
-      resetBtn: document.getElementById("resetBtn")
+      resetBtn: document.getElementById("resetBtn"),
+      jsStatus: document.getElementById("jsStatus")
     };
 
     function escapeHtml(value) {
@@ -1887,16 +1889,25 @@ Submit your work before the deadline.</textarea>
       }).join("");
     }
 
+    function setStatus(message, status = "pass") {
+      if (!dom.jsStatus) return;
+      dom.jsStatus.textContent = message;
+      dom.jsStatus.style.borderColor = status === "fail" ? "#fecaca" : status === "warn" ? "#fde68a" : "#bfdbfe";
+      dom.jsStatus.style.background = status === "fail" ? "#fee2e2" : status === "warn" ? "#fef3c7" : "#eff6ff";
+      dom.jsStatus.style.color = status === "fail" ? "#991b1b" : status === "warn" ? "#92400e" : "#1e40af";
+    }
+
     function generateOutput() {
-      const c = getConfig();
-      const s = styles(c);
-      const content = applyTypographyToOutput(buildLayout(c), c);
-      const output = `<div ${s.wrap}>\n${content.trim()}\n</div>`;
+      try {
+        const c = getConfig();
+        const s = styles(c);
+        const content = applyTypographyToOutput(buildLayout(c), c);
+        const output = `<div ${s.wrap}>\n${content.trim()}\n</div>`;
 
-      dom.code.value = output;
-      renderChecks(validateOutput(output, c));
+        dom.code.value = output;
+        renderChecks(validateOutput(output, c));
 
-      const previewDoc = `<!DOCTYPE html>
+        const previewDoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1907,7 +1918,20 @@ Submit your work before the deadline.</textarea>
 ${output}
 </body>
 </html>`;
-      dom.preview.srcdoc = previewDoc;
+
+        dom.preview.srcdoc = previewDoc;
+        setStatus("JavaScript running");
+      } catch (error) {
+        const message = `Builder error: ${error.message}`;
+        setStatus(message, "fail");
+        if (dom.code) {
+          dom.code.value = `The builder hit a JavaScript error before it could generate code.\n\n${error.stack || error.message}`;
+        }
+        if (dom.preview) {
+          dom.preview.srcdoc = `<!DOCTYPE html><html lang="en"><body style="font-family:Arial,sans-serif;padding:20px;color:#991b1b;"><h2>Preview error</h2><pre style="white-space:pre-wrap;">${escapeHtml(error.stack || error.message)}</pre></body></html>`;
+        }
+        console.error(error);
+      }
     }
 
     function copyCode() {
@@ -2015,9 +2039,25 @@ ${output}
       dom.resetBtn.addEventListener("click", resetBuilder);
     }
 
-    renderLayoutOptions();
-    setupEvents();
-    generateOutput();
+    function initBuilder() {
+      try {
+        renderLayoutOptions();
+        setupEvents();
+        generateOutput();
+      } catch (error) {
+        setStatus(`Startup error: ${error.message}`, "fail");
+        if (dom.code) {
+          dom.code.value = `The builder could not start.\n\n${error.stack || error.message}`;
+        }
+        console.error(error);
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initBuilder);
+    } else {
+      initBuilder();
+    }
   </script>
 </body>
 </html>
