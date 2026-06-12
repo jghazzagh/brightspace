@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brightspace Interactive Page Builder</title>
+    <style>
+        /* ==========================================================================
+           BUILDER UI STYLES (Not part of the generated LMS code)
+           ========================================================================== */
+        :root {
+            --bg-color: #f9fafb;
+            --panel-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --primary: #006fbf; /* D2L Blue */
+            --primary-hover: #005699;
+            --text-main: #202124;
+            --text-muted: #5f6368;
+            --font-stack: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-stack); background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Header */
+        header { background: #fff; padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.25rem; font-weight: 600; color: var(--text-main); }
+        .badge { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+
+        /* Main Layout */
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Left Column (Control Panel) */
+        .control-panel { width: 400px; background: var(--panel-bg); border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+        .form-section { display: flex; flex-direction: column; gap: 16px; }
+        .form-section-title { font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.875rem; font-weight: 500; }
+        .form-group input[type="text"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; font-size: 0.875rem; transition: border 0.2s; }
+        .form-group input[type="text"]:focus, .form-group input[type="number"]:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,111,191,0.1); }
+        .helper-text { font-size: 0.75rem; color: var(--text-muted); }
+        
+        /* Custom Inputs */
+        .color-picker-group { display: flex; align-items: center; gap: 8px; }
+        .color-picker-group input[type="color"] { width: 40px; height: 40px; padding: 0; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; }
+        .color-picker-group input[type="text"] { flex: 1; font-family: monospace; }
+        
+        /* Toggles */
+        .toggle-group { display: flex; align-items: center; gap: 10px; }
+        .toggle-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+        .toggle-group label { cursor: pointer; user-select: none; }
+
+        /* Right Column (Preview & Output) */
+        .preview-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg-color); overflow: hidden; }
+        .tabs { display: flex; background: #fff; border-bottom: 1px solid var(--border-color); padding: 0 24px; }
+        .tab-btn { padding: 16px 24px; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-btn:hover:not(.active) { color: var(--text-main); background: #f9fafb; }
+        
+        .tab-content { flex: 1; display: none; padding: 24px; overflow: hidden; position: relative; }
+        .tab-content.active { display: flex; flex-direction: column; }
+        .tab-content.scrollable { overflow-y: auto; }
+        
+        /* Iframe Preview */
+        .preview-frame { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        /* Code Editor */
+        .code-container { flex: 1; display: flex; flex-direction: column; position: relative; }
+        textarea { flex: 1; width: 100%; padding: 16px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.875rem; line-height: 1.5; color: #333; border: 1px solid var(--border-color); border-radius: 8px; resize: none; background: #f8f9fa; }
+        textarea:focus { outline: none; border-color: var(--primary); }
+        .copy-btn { position: absolute; top: 16px; right: 16px; background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .copy-btn:hover { background: var(--primary-hover); }
+        .copy-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* Instructions */
+        .instructions-content { max-width: 800px; line-height: 1.6; }
+        .instructions-content h2 { margin-bottom: 16px; color: var(--primary); font-size: 1.25rem; }
+        .instructions-content p { margin-bottom: 16px; }
+        .instructions-content ol { padding-left: 24px; margin-bottom: 16px; }
+        .instructions-content li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Brightspace Interactive Page Builder</h1>
+        <span class="badge">Instructional Design Tool</span>
+    </header>
+
+    <div class="app-container">
+        <!-- LEFT COLUMN: CONTROLS -->
+        <div class="control-panel" id="controls">
+            
+            <div class="form-section">
+                <div class="form-section-title">1. Global Theming</div>
+                <div class="form-group">
+                    <label for="primaryColorText">Primary Color</label>
+                    <div class="color-picker-group">
+                        <input type="color" id="primaryColorPicker" value="#0056b3">
+                        <input type="text" id="primaryColorText" value="#0056b3" pattern="^#[0-9A-Fa-f]{6}$">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="secondaryColorText">Secondary Background</label>
+                    <div class="color-picker-group">
+                        <input type="color" id="secondaryColorPicker" value="#f8f9fa">
+                        <input type="text" id="secondaryColorText" value="#f8f9fa" pattern="^#[0-9A-Fa-f]{6}$">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="typography">Typography</label>
+                    <select id="typography">
+                        <option value="Lato, sans-serif">Lato (Standard)</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">2. Layout Selection</div>
+                <div class="form-group">
+                    <label for="layout">Base Layout</label>
+                    <select id="layout">
+                        <option value="single">Single Column (Standard)</option>
+                        <option value="hero-2col">Hero Header + 2 Columns</option>
+                        <option value="intro-3grid">Intro + 3 Grid Cards</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">3. Media Integrations</div>
+                <div class="form-group">
+                    <label for="videoUrl">Video URL (YouTube/Vimeo)</label>
+                    <input type="text" id="videoUrl" placeholder="e.g., https://youtube.com/watch?v=...">
+                    <span class="helper-text">Will auto-generate a responsive 16:9 iframe wrapper.</span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">4. Interactive Elements</div>
+                <div class="form-group">
+                    <label for="numAccordion">Number of Accordions</label>
+                    <input type="number" id="numAccordion" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="numTabs">Number of Tabs</label>
+                    <input type="number" id="numTabs" value="0" min="0" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="numCards">Number of Flip Cards</label>
+                    <input type="number" id="numCards" value="0" min="0" max="12">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-title">5. Knowledge Check (MCQ)</div>
+                <div class="toggle-group" style="margin-bottom: 8px;">
+                    <input type="checkbox" id="incKnowledge">
+                    <label for="incKnowledge">Include Knowledge Check</label>
+                </div>
+                <div id="kc-config" style="display: none; flex-direction: column; gap: 8px;">
+                    <div class="form-group">
+                        <label>Question</label>
+                        <input type="text" id="kcQuestion" value="Which principle is most important for web accessibility?">
+                    </div>
+                    <div class="form-group">
+                        <label>Option A</label>
+                        <input type="text" id="kcOptA" value="Using only primary colors">
+                    </div>
+                    <div class="form-group">
+                        <label>Option B</label>
+                        <input type="text" id="kcOptB" value="Providing text alternatives for non-text content">
+                    </div>
+                    <div class="form-group">
+                        <label>Option C</label>
+                        <input type="text" id="kcOptC" value="Disabling keyboard navigation">
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Answer</label>
+                        <select id="kcCorrect">
+                            <option value="A">Option A</option>
+                            <option value="B" selected>Option B</option>
+                            <option value="C">Option C</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Success Feedback</label>
+                        <input type="text" id="kcSuccess" value="Correct! Providing text alternatives ensures screen readers can access content.">
+                    </div>
+                    <div class="form-group">
+                        <label>Error Feedback</label>
+                        <input type="text" id="kcError" value="Incorrect. Please review the accessibility guidelines and try again.">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: PREVIEW & OUTPUT -->
+        <div class="preview-panel">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('preview')">Live Preview</button>
+                <button class="tab-btn" onclick="switchTab('code')">Code Output</button>
+                <button class="tab-btn" onclick="switchTab('instructions')">Instructions</button>
+            </div>
+            
+            <div id="tab-preview" class="tab-content active">
+                <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+
+            <div id="tab-code" class="tab-content">
+                <div class="code-container">
+                    <button class="copy-btn" onclick="copyCode()" id="copyBtn">
+                        <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        Copy to Clipboard
+                    </button>
+                    <textarea id="codeOutput" readonly></textarea>
+                </div>
+            </div>
+
+            <div id="tab-instructions" class="tab-content scrollable">
+                <div class="instructions-content">
+                    <h2>How to embed this content into Brightspace</h2>
+                    <p>Follow these steps to seamlessly integrate your interactive layout into your Brightspace course module:</p>
+                    <ol>
+                        <li>Configure your layout, colors, and interactives using the left-hand panel.</li>
+                        <li>Verify everything looks correct in the <strong>Live Preview</strong> tab.</li>
+                        <li>Click on the <strong>Code Output</strong> tab and click the <strong>Copy to Clipboard</strong> button.</li>
+                        <li>Log in to your D2L Brightspace instance and navigate to your course.</li>
+                        <li>Go to <strong>Content</strong> and select the module where you want to add the page.</li>
+                        <li>Click <strong>New</strong> (or <strong>Upload / Create</strong>) and select <strong>Create a File</strong>.</li>
+                        <li>Enter a title for your document.</li>
+                        <li>In the HTML Editor toolbar, find and click the <strong>Source Code</strong> icon (usually represented by <code>&lt;/&gt;</code> or similar, at the bottom right or top toolbar depending on your editor version).</li>
+                        <li>Delete any existing code in the Source Code window, then paste the code you copied from this builder.</li>
+                        <li>Click <strong>Save</strong> in the Source Code window.</li>
+                        <li>Click <strong>Save and Close</strong> on the main Create a File screen.</li>
+                    </ol>
+                    <p><em>Note: Because all CSS is scoped to the <code>.d2l-bldr-wrapper</code> class and JS is encapsulated, this code will not interfere with Daylight styling or other course files!</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           BUILDER LOGIC
+           ========================================================================== */
+
+        // Attach event listeners to all inputs to trigger live updates safely
+        const controlsPanel = document.getElementById('controls');
+        if (controlsPanel) {
+            controlsPanel.addEventListener('input', (e) => {
+                // Sync Color Pickers and Hex Text Inputs
+                if (e.target.id === 'primaryColorPicker') document.getElementById('primaryColorText').value = e.target.value;
+                if (e.target.id === 'primaryColorText') {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) document.getElementById('primaryColorPicker').value = e.target.value;
+                }
+                if (e.target.id === 'secondaryColorPicker') document.getElementById('secondaryColorText').value = e.target.value;
+                if (e.target.id === 'secondaryColorText') {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) document.getElementById('secondaryColorPicker').value = e.target.value;
+                }
+
+                // Toggle KC Config display
+                const kcConfig = document.getElementById('kc-config');
+                const incKnowledge = document.getElementById('incKnowledge');
+                if (kcConfig && incKnowledge) {
+                    kcConfig.style.display = incKnowledge.checked ? 'flex' : 'none';
+                }
+
+                generateOutput();
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if(event && event.target) {
+                event.target.classList.add('active');
+            }
+            const tab = document.getElementById(`tab-${tabId}`);
+            if (tab) tab.classList.add('active');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeOutput')?.value || '';
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copyBtn');
+                if (!btn) return;
+                const origHtml = btn.innerHTML;
+                btn.innerHTML = 'Copied!';
+                setTimeout(() => btn.innerHTML = origHtml, 2000);
+            });
+        }
+
+        // Helper: Convert generic video URLs to embed URLs
+        function getVideoEmbedUrl(url) {
+            if (!url) return '';
+            let embedUrl = url;
+            if (url.includes('youtube.com/watch?v=')) {
+                embedUrl = url.replace('watch?v=', 'embed/');
+                const ampersandPos = embedUrl.indexOf('&');
+                if (ampersandPos !== -1) embedUrl = embedUrl.substring(0, ampersandPos);
+            } else if (url.includes('youtu.be/')) {
+                embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+            } else if (url.includes('vimeo.com/')) {
+                embedUrl = url.replace('vimeo.com/', 'player.vimeo.com/video/');
+            }
+            return embedUrl;
+        }
+
+        /* --- THE CORE GENERATOR ENGINE --- */
+        function generateOutput() {
+            // 1. Gather config safely using optional chaining to prevent 'null' errors
+            const config = {
+                primary: document.getElementById('primaryColorText')?.value || '#0056b3',
+                secondary: document.getElementById('secondaryColorText')?.value || '#f8f9fa',
+                text: '#202124',
+                border: '#e5e7eb',
+                font: document.getElementById('typography')?.value || 'Lato, sans-serif',
+                layout: document.getElementById('layout')?.value || 'single',
+                videoUrl: getVideoEmbedUrl(document.getElementById('videoUrl')?.value),
+                numAccordion: parseInt(document.getElementById('numAccordion')?.value, 10) || 0,
+                numTabs: parseInt(document.getElementById('numTabs')?.value, 10) || 0,
+                numCards: parseInt(document.getElementById('numCards')?.value, 10) || 0,
+                incKnowledge: document.getElementById('incKnowledge')?.checked || false,
+                kc: {
+                    q: document.getElementById('kcQuestion')?.value || '',
+                    a: document.getElementById('kcOptA')?.value || '',
+                    b: document.getElementById('kcOptB')?.value || '',
+                    c: document.getElementById('kcOptC')?.value || '',
+                    correct: document.getElementById('kcCorrect')?.value || 'A',
+                    success: document.getElementById('kcSuccess')?.value || '',
+                    error: document.getElementById('kcError')?.value || ''
+                }
+            };
+
+            // 2. Build Scoped CSS
+            let css = `<style>
+/* Scoped D2L Brightspace Output Styles */
+.d2l-bldr-wrapper {
+    font-family: ${config.font};
+    color: ${config.text};
+    line-height: 1.6;
+    max-width: 100%;
+    margin: 0 auto;
+}
+.d2l-bldr-wrapper * { box-sizing: border-box; }
+.d2l-bldr-wrapper h2 { color: ${config.primary}; margin-top: 0; }
+.d2l-bldr-wrapper h3 { color: ${config.text}; }
+.d2l-bldr-wrapper p { margin-bottom: 1rem; }
+
+/* Layouts */
+.d2l-bldr-hero { background-color: ${config.primary}; color: #ffffff; padding: 2.5rem 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; }
+.d2l-bldr-hero h1 { color: #ffffff; margin: 0 0 1rem 0; font-size: 2rem; }
+.d2l-bldr-grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.d2l-bldr-grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+@media (min-width: 768px) {
+    .d2l-bldr-grid-2 { grid-template-columns: 1fr 1fr; }
+    .d2l-bldr-grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+.d2l-bldr-card-basic { background: ${config.secondary}; padding: 1.5rem; border-radius: 8px; border: 1px solid ${config.border}; }
+
+/* Media */
+.d2l-bldr-video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; margin-bottom: 1.5rem; }
+.d2l-bldr-video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+/* Accordion */
+.d2l-bldr-accordion { margin-bottom: 2rem; }
+.d2l-bldr-acc-item { border: 1px solid ${config.border}; border-radius: 6px; margin-bottom: 0.5rem; overflow: hidden; }
+.d2l-bldr-acc-btn { width: 100%; text-align: left; background: ${config.secondary}; color: ${config.text}; font-weight: bold; border: none; padding: 1rem; cursor: pointer; font-family: inherit; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.d2l-bldr-acc-btn:hover, .d2l-bldr-acc-btn:focus { background: ${config.border}; outline: 2px solid ${config.primary}; outline-offset: -2px; }
+.d2l-bldr-acc-btn::after { content: '+'; font-size: 1.2rem; }
+.d2l-bldr-acc-btn[aria-expanded="true"]::after { content: '-'; }
+.d2l-bldr-acc-content { padding: 0 1rem; max-height: 0; overflow: hidden; visibility: hidden; transition: max-height 0.3s ease, padding 0.3s ease, visibility 0s 0.3s; }
+.d2l-bldr-acc-btn[aria-expanded="true"] + .d2l-bldr-acc-content { max-height: 500px; padding: 1rem; visibility: visible; transition: max-height 0.3s ease, padding 0.3s ease; }
+
+/* Tabs */
+.d2l-bldr-tabs { margin-bottom: 2rem; border: 1px solid ${config.border}; border-radius: 8px; overflow: hidden; }
+.d2l-bldr-tablist { display: flex; background: ${config.secondary}; border-bottom: 1px solid ${config.border}; margin: 0; padding: 0; list-style: none; overflow-x: auto; }
+.d2l-bldr-tab-btn { background: none; border: none; padding: 1rem 1.5rem; cursor: pointer; font-family: inherit; font-weight: bold; color: ${config.text}; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.d2l-bldr-tab-btn:hover { background: rgba(0,0,0,0.05); }
+.d2l-bldr-tab-btn[aria-selected="true"] { border-bottom-color: ${config.primary}; color: ${config.primary}; background: #fff; }
+.d2l-bldr-tab-btn:focus { outline: 2px solid ${config.primary}; outline-offset: -2px; }
+.d2l-bldr-tabpanel { padding: 1.5rem; background: #fff; display: none; }
+.d2l-bldr-tabpanel[aria-hidden="false"] { display: block; animation: d2lFadeIn 0.3s; }
+@keyframes d2lFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Flip Cards */
+.d2l-bldr-flip-container { perspective: 1000px; height: 250px; }
+.d2l-bldr-flip-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; border-radius: 8px; }
+.d2l-bldr-flip-container:focus .d2l-bldr-flip-inner { outline: 3px solid ${config.primary}; outline-offset: 4px; }
+.d2l-bldr-flip-container.is-flipped .d2l-bldr-flip-inner { transform: rotateY(180deg); }
+.d2l-bldr-flip-front, .d2l-bldr-flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; border-radius: 8px; border: 1px solid ${config.border}; }
+.d2l-bldr-flip-front { background-color: ${config.secondary}; color: ${config.text}; font-weight: bold; font-size: 1.2rem; }
+.d2l-bldr-flip-back { background-color: ${config.primary}; color: #ffffff; transform: rotateY(180deg); overflow-y: auto;}
+
+/* Knowledge Check */
+.d2l-bldr-kc { border: 2px solid ${config.primary}; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; background: #fff; }
+.d2l-bldr-kc fieldset { border: none; padding: 0; margin: 0; }
+.d2l-bldr-kc legend { font-weight: bold; font-size: 1.1rem; margin-bottom: 1rem; color: ${config.primary}; }
+.d2l-bldr-kc label { display: block; margin-bottom: 0.75rem; padding: 0.5rem; border: 1px solid ${config.border}; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+.d2l-bldr-kc label:hover { background: ${config.secondary}; }
+.d2l-bldr-kc input[type="radio"] { margin-right: 0.5rem; accent-color: ${config.primary}; }
+.d2l-bldr-kc-btn { background: ${config.primary}; color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: inherit; margin-top: 1rem; transition: filter 0.2s; }
+.d2l-bldr-kc-btn:hover { filter: brightness(1.1); }
+.d2l-bldr-kc-btn:focus { outline: 2px solid #000; outline-offset: 2px; }
+.d2l-bldr-kc-feedback { margin-top: 1rem; padding: 1rem; border-radius: 4px; display: none; font-weight: bold; }
+.d2l-bldr-kc-feedback.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+.d2l-bldr-kc-feedback.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+</style>\n`;
+
+            // 3. Build HTML Structure
+            let html = `<div class="d2l-bldr-wrapper">\n`;
+
+            // Media Elements helper
+            const mediaHtml = config.videoUrl ? `\n    <div class="d2l-bldr-video-wrap"><iframe src="${config.videoUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Embedded Video"></iframe></div>\n` : '';
+
+            // Interactives HTML helper
+            let interactivesHtml = '';
+            
+            if (config.numAccordion > 0) {
+                interactivesHtml += `\n    <div class="d2l-bldr-accordion" role="presentation">\n        <h2>Module Resources</h2>\n`;
+                for (let i = 1; i <= config.numAccordion; i++) {
+                    interactivesHtml += `        <div class="d2l-bldr-acc-item">
+            <button class="d2l-bldr-acc-btn" aria-expanded="false" aria-controls="d2l-acc-sect${i}" id="d2l-acc-btn${i}">Accordion Title ${i}</button>
+            <div id="d2l-acc-sect${i}" class="d2l-bldr-acc-content" role="region" aria-labelledby="d2l-acc-btn${i}">
+                <p>Content for accordion panel ${i}. Modify this text in the Brightspace editor.</p>
+            </div>
+        </div>\n`;
+                }
+                interactivesHtml += `    </div>\n`;
+            }
+
+            if (config.numTabs > 0) {
+                interactivesHtml += `\n    <div class="d2l-bldr-tabs">\n        <div class="d2l-bldr-tablist" role="tablist" aria-label="Interactive Tabs">\n`;
+                for (let i = 1; i <= config.numTabs; i++) {
+                    const selected = i === 1 ? 'true' : 'false';
+                    const tabIndex = i === 1 ? '0' : '-1';
+                    interactivesHtml += `            <button role="tab" aria-selected="${selected}" aria-controls="d2l-panel-${i}" id="d2l-tab-${i}" tabindex="${tabIndex}" class="d2l-bldr-tab-btn">Tab ${i}</button>\n`;
+                }
+                interactivesHtml += `        </div>\n`;
+                for (let i = 1; i <= config.numTabs; i++) {
+                    const hidden = i === 1 ? 'false' : 'true';
+                    interactivesHtml += `        <div id="d2l-panel-${i}" role="tabpanel" tabindex="0" aria-labelledby="d2l-tab-${i}" class="d2l-bldr-tabpanel" aria-hidden="${hidden}">
+            <h3>Tab ${i} Heading</h3><p>Content for tab ${i}. Modify this text in the Brightspace HTML editor.</p>
+        </div>\n`;
+                }
+                interactivesHtml += `    </div>\n`;
+            }
+
+            if (config.numCards > 0) {
+                interactivesHtml += `\n    <h2>Key Concepts</h2>\n    <div class="d2l-bldr-grid-3">\n`;
+                for (let i = 1; i <= config.numCards; i++) {
+                    interactivesHtml += `        <div class="d2l-bldr-flip-container" tabindex="0" role="button" aria-pressed="false" aria-label="Flip card to reveal Concept ${i}">
+            <div class="d2l-bldr-flip-inner">
+                <div class="d2l-bldr-flip-front">Concept ${i}</div>
+                <div class="d2l-bldr-flip-back"><p>Explanation of Concept ${i}.</p></div>
+            </div>
+        </div>\n`;
+                }
+                interactivesHtml += `    </div>\n`;
+            }
+
+            if (config.incKnowledge) {
+                const k = config.kc;
+                // Escape quotes for HTML attributes safely
+                const esc = str => (str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                interactivesHtml += `
+    <div class="d2l-bldr-kc">
+        <fieldset id="d2l-kc-group">
+            <legend>Knowledge Check: ${esc(k.q)}</legend>
+            <label><input type="radio" name="d2l-kc-q1" value="${k.correct === 'A' ? 'correct' : 'wrong'}"> A) ${esc(k.a)}</label>
+            <label><input type="radio" name="d2l-kc-q1" value="${k.correct === 'B' ? 'correct' : 'wrong'}"> B) ${esc(k.b)}</label>
+            <label><input type="radio" name="d2l-kc-q1" value="${k.correct === 'C' ? 'correct' : 'wrong'}"> C) ${esc(k.c)}</label>
+        </fieldset>
+        <button class="d2l-bldr-kc-btn" id="d2l-kc-submit">Check Answer</button>
+        <div id="d2l-kc-feedback" class="d2l-bldr-kc-feedback" aria-live="polite" data-success="${esc(k.success)}" data-error="${esc(k.error)}"></div>
+    </div>\n`;
+            }
+
+            // Assemble Layout
+            if (config.layout === 'single') {
+                html += `
+    <h2>Module Introduction</h2>
+    <p>Welcome to this module. Please review the media and interactives below to complete your learning objectives.</p>
+    ${mediaHtml}
+    ${interactivesHtml}
+`;
+            } else if (config.layout === 'hero-2col') {
+                html += `
+    <div class="d2l-bldr-hero">
+        <h1>Course Module Overview</h1>
+        <p>Mastering the core fundamentals and applying them effectively.</p>
+    </div>
+    <div class="d2l-bldr-grid-2">
+        <div>
+            <h2>Learning Objectives</h2>
+            <p>By the end of this section, learners will be able to synthesize key data points and apply accessible design principles.</p>
+            ${interactivesHtml}
+        </div>
+        <div>
+            ${mediaHtml}
+        </div>
+    </div>
+`;
+            } else if (config.layout === 'intro-3grid') {
+                html += `
+    <h2>Introduction</h2>
+    <p>Please review the introductory materials before exploring the specific components outlined below.</p>
+    ${mediaHtml}
+    <div class="d2l-bldr-grid-3">
+        <div class="d2l-bldr-card-basic">
+            <h3>Phase 1</h3>
+            <p>Initial discovery and requirement gathering processes.</p>
+        </div>
+        <div class="d2l-bldr-card-basic">
+            <h3>Phase 2</h3>
+            <p>Design, development, and iterative testing cycles.</p>
+        </div>
+        <div class="d2l-bldr-card-basic">
+            <h3>Phase 3</h3>
+            <p>Final deployment, evaluation, and post-launch review.</p>
+        </div>
+    </div>
+    ${interactivesHtml}
+`;
+            }
+
+            html += `</div>\n`;
+
+            // 4. Build JS (IIFE to protect namespace)
+            let js = `\n<script>
+/**
+ * D2L Brightspace Interactive Logic
+ * Encapsulated in an IIFE to prevent global namespace pollution.
+ * Implements strict WCAG 2.1 AA keyboard/ARIA requirements.
+ */
+(function() {
+    function initInteractives() {
+        // --- Accordion Logic ---
+        const accBtns = document.querySelectorAll('.d2l-bldr-acc-btn');
+        accBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+            });
+        });
+
+        // --- Tabs Logic (WCAG pattern) ---
+        const tabBtns = document.querySelectorAll('.d2l-bldr-tab-btn');
+        const tabPanels = document.querySelectorAll('.d2l-bldr-tabpanel');
+        let tabFocus = 0;
+
+        tabBtns.forEach((btn, index) => {
+            // Click handling
+            btn.addEventListener('click', function() {
+                tabBtns.forEach(b => { b.setAttribute('aria-selected', 'false'); b.setAttribute('tabindex', '-1'); });
+                tabPanels.forEach(p => p.setAttribute('aria-hidden', 'true'));
+                
+                this.setAttribute('aria-selected', 'true');
+                this.setAttribute('tabindex', '0');
+                const controlsId = this.getAttribute('aria-controls');
+                if (controlsId) {
+                    const panel = document.getElementById(controlsId);
+                    if (panel) panel.setAttribute('aria-hidden', 'false');
+                }
+                tabFocus = index;
+            });
+
+            // Keyboard handling (Arrow keys)
+            btn.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    tabBtns[tabFocus].setAttribute('tabindex', '-1');
+                    if (e.key === 'ArrowRight') {
+                        tabFocus++;
+                        if (tabFocus >= tabBtns.length) tabFocus = 0;
+                    } else if (e.key === 'ArrowLeft') {
+                        tabFocus--;
+                        if (tabFocus < 0) tabFocus = tabBtns.length - 1;
+                    }
+                    tabBtns[tabFocus].setAttribute('tabindex', '0');
+                    tabBtns[tabFocus].focus();
+                }
+            });
+        });
+
+        // --- Flip Cards Logic (Keyboard Accessible) ---
+        const flipCards = document.querySelectorAll('.d2l-bldr-flip-container');
+        flipCards.forEach(card => {
+            const toggleFlip = () => {
+                card.classList.toggle('is-flipped');
+                card.setAttribute('aria-pressed', card.classList.contains('is-flipped'));
+            };
+            card.addEventListener('click', toggleFlip);
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleFlip();
+                }
+            });
+        });
+
+        // --- Knowledge Check Logic ---
+        const kcSubmit = document.getElementById('d2l-kc-submit');
+        if (kcSubmit) {
+            kcSubmit.addEventListener('click', function() {
+                const selected = document.querySelector('input[name="d2l-kc-q1"]:checked');
+                const feedback = document.getElementById('d2l-kc-feedback');
+                
+                if (!feedback) return;
+
+                if (!selected) {
+                    feedback.className = 'd2l-bldr-kc-feedback';
+                    feedback.style.display = 'block';
+                    feedback.style.color = '#856404';
+                    feedback.style.backgroundColor = '#fff3cd';
+                    feedback.style.borderColor = '#ffeeba';
+                    feedback.textContent = 'Please select an answer before checking.';
+                    return;
+                }
+
+                if (selected.value === 'correct') {
+                    feedback.className = 'd2l-bldr-kc-feedback correct';
+                    feedback.textContent = feedback.getAttribute('data-success');
+                } else {
+                    feedback.className = 'd2l-bldr-kc-feedback incorrect';
+                    feedback.textContent = feedback.getAttribute('data-error');
+                }
+            });
+        }
+    }
+
+    // Ensure DOM is ready in LMS environments
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initInteractives);
+    } else {
+        initInteractives();
+    }
+})();
+<\/script>`;
+
+            // Combine for Output
+            const finalOutput = css + html + js;
+            
+            // Set Textarea safely
+            const codeOutput = document.getElementById('codeOutput');
+            if (codeOutput) codeOutput.value = finalOutput;
+
+            // Update Iframe Preview (wrapped in full HTML for correct browser rendering inside the iframe)
+            const iframeDoc = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Preview</title></head>
+                <body style="margin:0; padding:24px; background:#fff;">
+                    ${finalOutput}
+                </body>
+                </html>
+            `;
+            const previewFrame = document.getElementById('previewFrame');
+            if (previewFrame) previewFrame.srcdoc = iframeDoc;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', generateOutput);
+
+    </script>
+</body>
+</html>
