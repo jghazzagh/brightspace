@@ -776,7 +776,7 @@ Submit your work before the deadline.</textarea>
           <div class="field">
             <label for="videoUrl">Video embed URL</label>
             <input id="videoUrl" type="url" value="https://www.youtube.com/watch?v=ZZ5LpwO-An4&amp;t=2s" />
-            <p class="help">Use the embed URL, not the regular watch URL.</p>
+            <p class="help">Paste a YouTube watch, youtu.be, or embed URL. The builder will convert supported YouTube links into embed format.</p>
           </div>
 
           <div class="field">
@@ -1305,6 +1305,8 @@ Submit your work before the deadline.</textarea>
       if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(raw)) {
         return escapeAttr(raw);
       }
+      return fallback;
+    }
 
     function toEmbedUrl(value) {
       const raw = String(value || "").trim();
@@ -1359,8 +1361,6 @@ Submit your work before the deadline.</textarea>
       const m = Number((time.match(/(\d+)m/) || [0, 0])[1]);
       const s = Number((time.match(/(\d+)s/) || [0, 0])[1]);
       return h * 3600 + m * 60 + s;
-    }
-      return fallback;
     }
 
     function isValidHex(value) {
