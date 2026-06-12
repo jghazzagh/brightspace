@@ -24,7 +24,7 @@
       --code-text: #e5e7eb;
       --radius: 12px;
       --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font: Arial, Helvetica, sans-serif;
     }
 
     * {
@@ -672,7 +672,6 @@
               <option value="discussionPrompt">Discussion prompt</option>
               <option value="videoLesson">Video lesson page</option>
               <option value="studentResources">Student resource page</option>
-              <option value="faqPage">FAQ page</option>
               <option value="announcement">Announcement</option>
               <option value="facultyTraining">Faculty training page</option>
               <option value="instructorPlan">Instructor plan / syllabus section</option>
@@ -723,27 +722,8 @@
       </details>
 
       <details class="section">
-        <summary>3. Images, video, and links</summary>
+        <summary>3. Video and links</summary>
         <div class="section-body">
-          <div class="field">
-            <label for="imageUrl">Image URL</label>
-            <input id="imageUrl" type="url" value="https://placehold.co/900x520/0056b3/ffffff?text=Course+Image" />
-            <p class="help">Use a Brightspace course file URL or a trusted hosted image. Avoid relying on temporary image links.</p>
-          </div>
-
-          <div class="field">
-            <label for="imageAlt">Image alt text</label>
-            <input id="imageAlt" type="text" value="Course image placeholder" />
-          </div>
-
-          <div class="field">
-            <label>
-              <input id="decorativeImage" type="checkbox" />
-              Image is decorative
-            </label>
-            <p class="help">Decorative images output with empty alt text.</p>
-          </div>
-
           <div class="field">
             <label for="videoUrl">Video embed URL</label>
             <input id="videoUrl" type="url" value="https://www.youtube.com/embed/VIDEO_ID" />
@@ -823,14 +803,28 @@
           <div class="field">
             <label for="fontStack">Font stack</label>
             <select id="fontStack">
+              <option value='"Lato", Arial, sans-serif' selected>Lato if available in Brightspace</option>
               <option value='system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'>System UI / Segoe UI</option>
               <option value='Arial, Helvetica, sans-serif'>Arial / Helvetica</option>
               <option value='Verdana, Geneva, sans-serif'>Verdana</option>
               <option value='"Trebuchet MS", Arial, sans-serif'>Trebuchet MS</option>
               <option value='Georgia, "Times New Roman", serif'>Georgia Serif</option>
-              <option value='"Lato", Arial, sans-serif'>Lato if available in Brightspace</option>
             </select>
-            <p class="help">System fonts are safest because Brightspace may not load external font files.</p>
+            <p class="help">Lato is selected by default. If Brightspace does not load Lato, the page will fall back to Arial.</p>
+          </div>
+
+          <div class="field">
+            <label for="bodyFontSize">Normal text size</label>
+            <select id="bodyFontSize">
+              <option value="16px">16px</option>
+              <option value="17px">17px</option>
+              <option value="18px">18px</option>
+              <option value="19px" selected>19px, recommended</option>
+              <option value="20px">20px</option>
+              <option value="21px">21px</option>
+              <option value="22px">22px</option>
+            </select>
+            <p class="help">This controls the normal body text size in the generated Brightspace page.</p>
           </div>
         </div>
       </details>
@@ -888,7 +882,7 @@
           <h2>How to use this with D2L Brightspace</h2>
           <ol>
             <li>Choose a page purpose and layout.</li>
-            <li>Edit the page text, links, images, video details, colors, and font stack.</li>
+            <li>Edit the page text, links, video details, colors, font size, and font stack.</li>
             <li>Review the accessibility checks. Warnings do not always mean the page is unusable, but they should be reviewed before copying.</li>
             <li>Open the <strong>Brightspace code</strong> tab and copy the generated code.</li>
             <li>In Brightspace, create or edit a content page.</li>
@@ -958,12 +952,6 @@
         title: "Resource cards",
         desc: "Flexible cards for student or course resources.",
         thumb: "cards"
-      },
-      {
-        id: "faqAccordion",
-        title: "FAQ accordion",
-        desc: "Native details/summary accordion, no JavaScript.",
-        thumb: "accordion"
       },
       {
         id: "processSteps",
@@ -1067,15 +1055,6 @@
         twoText: "Use technology support resources when you need help with Brightspace, email, software, or campus systems.",
         layout: "resourceCards"
       },
-      faqPage: {
-        title: "Frequently Asked Questions",
-        intro: "Review these common questions before contacting your instructor. The answer you need may already be here.",
-        oneTitle: "Course Questions",
-        oneText: "Find answers about assignments, due dates, grading, communication, and course expectations.",
-        twoTitle: "Technology Questions",
-        twoText: "Find answers about Brightspace access, submitting assignments, and locating course materials.",
-        layout: "faqAccordion"
-      },
       announcement: {
         title: "Important Course Announcement",
         intro: "Please review this announcement carefully. It includes important information about the course.",
@@ -1114,9 +1093,6 @@
       oneText: document.getElementById("sectionOneText"),
       twoTitle: document.getElementById("sectionTwoTitle"),
       twoText: document.getElementById("sectionTwoText"),
-      imageUrl: document.getElementById("imageUrl"),
-      imageAlt: document.getElementById("imageAlt"),
-      decorativeImage: document.getElementById("decorativeImage"),
       videoUrl: document.getElementById("videoUrl"),
       videoTitle: document.getElementById("videoTitle"),
       transcriptUrl: document.getElementById("transcriptUrl"),
@@ -1132,6 +1108,7 @@
       accentPicker: document.getElementById("accentColorPicker"),
       accentText: document.getElementById("accentColorText"),
       font: document.getElementById("fontStack"),
+      bodyFontSize: document.getElementById("bodyFontSize"),
       checks: document.getElementById("accessibilityChecks"),
       preview: document.getElementById("previewFrame"),
       code: document.getElementById("codeOutput"),
@@ -1210,9 +1187,6 @@
       if (type === "video") {
         return '<div class="thumb"><div class="mini-card" style="min-height:25px;"></div><div class="line"></div><div class="line"></div></div>';
       }
-      if (type === "accordion") {
-        return '<div class="thumb"><div class="bar"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>';
-      }
       if (type === "timeline") {
         return '<div class="thumb"><div class="bar"></div><div class="line"></div><div class="line"></div><div class="line"></div></div>';
       }
@@ -1283,6 +1257,7 @@
         text: isValidHex(dom.textText.value) ? dom.textText.value : "#202124",
         accent: isValidHex(dom.accentText.value) ? dom.accentText.value : "#0f766e",
         font: dom.font.value,
+        bodyFontSize: dom.bodyFontSize.value || "19px",
         layout: getSelectedLayout(),
         title: escapeHtml(dom.title.value),
         intro: escapeHtml(dom.intro.value),
@@ -1290,9 +1265,6 @@
         oneText: escapeHtml(dom.oneText.value),
         twoTitle: escapeHtml(dom.twoTitle.value),
         twoText: escapeHtml(dom.twoText.value),
-        imageUrl: sanitizeUrl(dom.imageUrl.value, "https://placehold.co/900x520/0056b3/ffffff?text=Course+Image"),
-        imageAlt: dom.decorativeImage.checked ? "" : escapeAttr(dom.imageAlt.value),
-        isDecorative: dom.decorativeImage.checked,
         videoUrl: sanitizeUrl(dom.videoUrl.value, "#"),
         videoTitle: escapeAttr(dom.videoTitle.value || "Course video"),
         transcriptUrl: sanitizeUrl(dom.transcriptUrl.value, "#"),
@@ -1303,7 +1275,7 @@
 
     function styles(c) {
       return {
-        wrap: `style="max-width: 1120px; margin: 0 auto; padding: 18px; box-sizing: border-box; line-height: 1.6; font-family: ${c.font}; color: ${c.text};"`,
+        wrap: `style="max-width: 1120px; margin: 0 auto; padding: 18px; box-sizing: border-box; line-height: 1.6; font-family: ${c.font}; font-size: ${c.bodyFontSize}; color: ${c.text};"`,
         hero: `style="background-color: ${c.primary}; color: #ffffff; padding: 2.4rem 1.8rem; border-radius: 14px; margin-bottom: 1.5rem; box-sizing: border-box;"`,
         heroCenter: `style="background-color: ${c.primary}; color: #ffffff; padding: 2.8rem 1.8rem; border-radius: 14px; margin-bottom: 1.5rem; text-align: center; box-sizing: border-box;"`,
         rowCenter: `style="display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center; margin-bottom: 1.5rem; box-sizing: border-box;"`,
@@ -1348,7 +1320,6 @@
 
     function buildLayout(c) {
       const s = styles(c);
-      const imageAltAttr = c.isDecorative ? 'alt=""' : `alt="${c.imageAlt}"`;
       const button = `<a href="${c.buttonUrl}" ${s.btn}>${c.buttonText}</a>`;
 
       const titleBlock = `
@@ -1390,30 +1361,28 @@
               { title: c.twoTitle, text: c.twoText },
               { title: "Need Help?", text: "Contact your instructor early if directions, deadlines, or expectations are unclear." }
             ])}
-            <div ${s.rowCenter}>
-              <div ${s.col2}>
-                <img src="${c.imageUrl}" ${imageAltAttr} ${s.img} />
-              </div>
-              <div ${s.col2}>
-                <h2 ${s.h2}>Module Roadmap</h2>
-                ${checklist(["Read the overview.", "Complete the required content.", "Participate in the learning activity.", "Submit your work."])}
-              </div>
+            <div ${s.callout}>
+              <h3 ${s.h3}>Module Roadmap</h3>
+              ${checklist(["Read the overview.", "Complete the required content.", "Participate in the learning activity.", "Submit your work."])}
             </div>`;
 
         case "lessonContent":
           return `
-            <div ${s.rowCenter}>
+            <h2 ${s.h2}>${c.title}</h2>
+            <p style="margin-bottom: 1.2rem;">${c.intro}</p>
+            <div ${s.rowStretch}>
               <div ${s.col2}>
-                <h2 ${s.h2}>${c.title}</h2>
-                <p style="margin-bottom: 1rem;">${c.intro}</p>
-                <h3 ${s.h3}>${c.oneTitle}</h3>
-                <p style="margin-bottom: 1rem;">${c.oneText}</p>
-                <h3 ${s.h3}>${c.twoTitle}</h3>
-                <p style="margin-bottom: 1rem;">${c.twoText}</p>
-                ${button}
+                <div ${s.card}>
+                  <h3 ${s.h3}>${c.oneTitle}</h3>
+                  <p style="margin: 0;">${c.oneText}</p>
+                </div>
               </div>
               <div ${s.col2}>
-                <img src="${c.imageUrl}" ${imageAltAttr} ${s.img} />
+                <div ${s.card}>
+                  <h3 ${s.h3}>${c.twoTitle}</h3>
+                  <p style="margin-bottom: 1rem;">${c.twoText}</p>
+                  ${button}
+                </div>
               </div>
             </div>`;
 
@@ -1474,22 +1443,6 @@
               { title: "Accessibility and Accommodations", text: "Use support services if you need accommodations or additional help accessing course materials." }
             ])}`;
 
-        case "faqAccordion":
-          return `
-            <h2 ${s.h2}>${c.title}</h2>
-            <p style="margin-bottom:1.2rem;">${c.intro}</p>
-            <details ${s.details}>
-              <summary ${s.summary}>${c.oneTitle}</summary>
-              <p style="margin: 0.8rem 0 0 0;">${c.oneText}</p>
-            </details>
-            <details ${s.details}>
-              <summary ${s.summary}>${c.twoTitle}</summary>
-              <p style="margin: 0.8rem 0 0 0;">${c.twoText}</p>
-            </details>
-            <details ${s.details}>
-              <summary ${s.summary}>What should I do if I need help?</summary>
-              <p style="margin: 0.8rem 0 0 0;">Contact your instructor early and include specific details about the issue, assignment, or page where you need help.</p>
-            </details>`;
 
         case "processSteps":
           return `
@@ -1516,18 +1469,11 @@
 
         case "caseStudy":
           return `
-            <div ${s.rowCenter}>
-              <div ${s.col2}>
-                <img src="${c.imageUrl}" ${imageAltAttr} ${s.img} />
-              </div>
-              <div ${s.col2}>
-                <h2 ${s.h2}>${c.title}</h2>
-                <p style="margin-bottom:1rem;">${c.intro}</p>
-                <div ${s.callout}>
-                  <h3 ${s.h3}>Scenario</h3>
-                  <p style="margin:0;">${c.oneText}</p>
-                </div>
-              </div>
+            <h2 ${s.h2}>${c.title}</h2>
+            <p style="margin-bottom:1rem;">${c.intro}</p>
+            <div ${s.callout}>
+              <h3 ${s.h3}>Scenario</h3>
+              <p style="margin:0;">${c.oneText}</p>
             </div>
             <div ${s.card}>
               <h3 ${s.h3}>Reflection Questions</h3>
@@ -1605,14 +1551,6 @@
         title: "Descriptive link/button text",
         text: vagueLink ? "Button text is vague. Use specific action text." : "Button text is specific enough for most users.",
         status: vagueLink ? "warn" : "pass"
-      });
-
-      const layoutNeedsImage = ["moduleIntro", "lessonContent", "caseStudy"].includes(c.layout);
-      const missingAlt = layoutNeedsImage && !c.isDecorative && !dom.imageAlt.value.trim();
-      checks.push({
-        title: "Image alt text",
-        text: missingAlt ? "This layout uses an image, but alt text is missing." : c.isDecorative ? "Image is marked decorative and will output with empty alt text." : "Alt text is present or this layout does not require an image.",
-        status: missingAlt ? "fail" : "pass"
       });
 
       const videoLayout = c.layout === "videoLesson";
@@ -1702,10 +1640,8 @@ ${output}
       dom.themePreset.value = "mccBlue";
       applyTheme("mccBlue");
       applyPurposePreset("weeklyOverview");
-      dom.font.value = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-      dom.imageUrl.value = "https://placehold.co/900x520/0056b3/ffffff?text=Course+Image";
-      dom.imageAlt.value = "Course image placeholder";
-      dom.decorativeImage.checked = false;
+      dom.font.value = '"Lato", Arial, sans-serif';
+      dom.bodyFontSize.value = "19px";
       dom.videoUrl.value = "https://www.youtube.com/embed/VIDEO_ID";
       dom.videoTitle.value = "Course lecture video";
       dom.transcriptUrl.value = "#";
