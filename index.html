@@ -229,7 +229,7 @@
             <div id="tab-instructions" class="tab-content scrollable">
                 <div class="instructions-content">
                     <h2>Integrating with D2L Brightspace</h2>
-                    <p>This layout generator is specifically engineered to bypass Brightspace's HTML sanitizers. It uses <strong>inline CSS</strong> for colors and fonts, and scoped classes for structural grids, ensuring it renders perfectly on both desktop and the Pulse mobile app.</p>
+                    <p>This layout generator is specifically engineered to bypass Brightspace's HTML sanitizers. It uses <strong>100% inline CSS</strong> for everything—colors, typography, spacing, and responsive grids—ensuring there are zero <code>&lt;style&gt;</code> tags or header scripts to get stripped out.</p>
                     
                     <h3>Step-by-Step Guide</h3>
                     <ol>
@@ -377,61 +377,47 @@
             updateBadge('badge-pri-wht', 'ratio-pri-wht', getContrastRatio(pColor, '#ffffff'), 'normal');
             updateBadge('badge-wht-pri', 'ratio-wht-pri', getContrastRatio('#ffffff', pColor), 'large');
 
-            // --- 1. SCOPED STRUCTURAL CSS (Safe for Brightspace Body) ---
-            // Only structural layout (grid/flex/media queries). All colors and typography are inline.
-            let cssBlock = `
-<style>
-.d2l-lyt-wrapper { max-width: 1200px; margin: 0 auto; padding: 15px; box-sizing: border-box; line-height: 1.6; }
-.d2l-lyt-wrapper * { box-sizing: border-box; }
-.d2l-lyt-wrapper img { max-width: 100%; height: auto; border-radius: 8px; display: block; }
-.d2l-lyt-hero { padding: 3rem 2rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; }
-.d2l-lyt-grid-2 { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; align-items: center; }
-.d2l-lyt-grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-.d2l-lyt-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; text-align: center; }
-.d2l-lyt-sidebar-l { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-.d2l-lyt-sidebar-r { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-.d2l-lyt-card { padding: 1.5rem; border-radius: 8px; height: 100%; }
-.d2l-lyt-timeline { border-left: 4px solid; padding-left: 1.5rem; margin-left: 1rem; margin-bottom: 2rem; }
-.d2l-lyt-timeline-item { position: relative; margin-bottom: 2rem; }
-.d2l-lyt-timeline-item::before { content: ''; position: absolute; left: -2.2rem; top: 0.2rem; width: 1rem; height: 1rem; border-radius: 50%; }
-.d2l-lyt-video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; margin-bottom: 1.5rem; }
-.d2l-lyt-video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-@media (min-width: 768px) {
-    .d2l-lyt-grid-2 { grid-template-columns: 1fr 1fr; }
-    .d2l-lyt-grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .d2l-lyt-grid-4 { grid-template-columns: repeat(4, 1fr); }
-    .d2l-lyt-sidebar-l { grid-template-columns: 1fr 3fr; }
-    .d2l-lyt-sidebar-r { grid-template-columns: 3fr 1fr; }
-}
-</style>
-`;
+            // --- 1. RESPONSIVE INLINE HELPERS (NO MEDIA QUERIES) ---
+            // These advanced flexbox algorithms allow columns to stack on mobile and sit side-by-side on desktop purely via inline styles.
+            const inlineWrap = `style="max-width: 1200px; margin: 0 auto; padding: 15px; box-sizing: border-box; line-height: 1.6; font-family: ${font}; color: ${tColor};"`;
+            const fWrapCenter = `style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; margin-bottom: 2rem; box-sizing: border-box;"`;
+            const fWrapStretch = `style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: stretch; margin-bottom: 2rem; box-sizing: border-box;"`;
+            const fCol2 = `style="flex: 1 1 calc(50% - 1rem); min-width: 280px; box-sizing: border-box;"`;
+            const fCol3 = `style="flex: 1 1 calc(33.333% - 1.5rem); min-width: 250px; box-sizing: border-box;"`;
+            const fCol4 = `style="flex: 1 1 calc(25% - 1.5rem); min-width: 200px; box-sizing: border-box; text-align: center;"`;
+            const fAside = `style="flex: 1 1 250px; box-sizing: border-box;"`;
+            const fMain = `style="flex: 3 1 500px; box-sizing: border-box;"`; 
 
-            // --- 2. HTML CONTENT GENERATOR (Aggressive Inline CSS) ---
-            // Helper strings to keep code clean and highly customizable via inline CSS
-            const inlineWrap = `style="font-family: ${font}; color: ${tColor};"`;
-            const inlineHero = `style="background-color: ${pColor}; color: #ffffff;"`;
-            const inlineCard = `style="background-color: ${sColor}; border: 1px solid #e5e7eb;"`;
+            // Typography & Visual Helpers
+            const inlineHero = `style="background-color: ${pColor}; color: #ffffff; padding: 3rem 2rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; box-sizing: border-box;"`;
+            const inlineCard = `style="background-color: ${sColor}; border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 8px; box-sizing: border-box; height: 100%;"`;
             const inlineH2 = `style="color: ${pColor}; margin-top: 0; margin-bottom: 1rem; font-size: 1.75rem;"`;
             const inlineH3 = `style="color: ${pColor}; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem;"`;
             const inlineH3Wht = `style="color: #ffffff; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem;"`;
-            const inlineTimeLine = `style="border-color: ${pColor};"`;
+            const inlineImg = `style="max-width: 100%; height: auto; border-radius: 8px; display: block; box-sizing: border-box;"`;
+            const inlineTimeLine = `style="border-left: 4px solid ${pColor}; padding-left: 1.5rem; margin-left: 1rem; margin-bottom: 2rem; box-sizing: border-box;"`;
+            
+            // Video Wrapper (Responsive 16:9 purely inline)
+            const videoWrap = `style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; margin-bottom: 1.5rem; box-sizing: border-box;"`;
+            const videoIframe = `style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"`;
 
+            // --- 2. HTML CONTENT GENERATOR ---
             let htmlContent = '';
 
             switch(layoutId) {
                 case 'l1':
                     htmlContent = `
-    <div class="d2l-lyt-hero" ${inlineHero}>
+    <div ${inlineHero}>
         <h1 style="margin: 0 0 1rem 0; font-size: 2.25rem;">Module 1: Introduction</h1>
         <p style="font-size: 1.1rem; margin:0;">Establishing the core principles and expectations for the course.</p>
     </div>
     <h2 ${inlineH2}>Overview</h2>
     <p style="margin-bottom: 1rem;">Welcome to the first module. In this section, we will cover the foundational elements necessary to succeed in this course. Please read through the materials carefully and complete the assigned readings.</p>
-    <blockquote style="border-left: 4px solid ${pColor}; padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: #555;">
+    <blockquote style="border-left: 4px solid ${pColor}; padding-left: 1rem; margin: 1.5rem 0; font-style: italic; color: #555; box-sizing: border-box;">
         "Education is the passport to the future, for tomorrow belongs to those who prepare for it today."
     </blockquote>
     <h2 ${inlineH2}>Learning Objectives</h2>
-    <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
+    <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; box-sizing: border-box;">
         <li style="margin-bottom: 0.5rem;">Identify key concepts and terminology.</li>
         <li style="margin-bottom: 0.5rem;">Analyze historical context and implications.</li>
         <li style="margin-bottom: 0.5rem;">Apply theoretical frameworks to practical examples.</li>
@@ -439,15 +425,15 @@
                     break;
                 case 'l2':
                     htmlContent = `
-    <div class="d2l-lyt-grid-2">
-        <div>
+    <div ${fWrapCenter}>
+        <div ${fCol2}>
             <h2 ${inlineH2}>Analyzing the Data</h2>
             <p style="margin-bottom: 1rem;">When reviewing the recent metrics, it is vital to segment the audience correctly. By understanding user behavior, we can tailor our instructional methods to yield better engagement.</p>
             <p style="margin-bottom: 1rem;">Review the chart to the right to see the year-over-year growth in retention rates following the implementation of our new pedagogical strategy.</p>
-            <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: ${pColor}; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold;">Download Full Report</a>
+            <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: ${pColor}; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; box-sizing: border-box;">Download Full Report</a>
         </div>
-        <div>
-            <img src="${placeImg}" alt="Data visualization chart" />
+        <div ${fCol2}>
+            <img src="${placeImg}" alt="Data visualization chart" ${inlineImg} />
         </div>
     </div>`;
                     break;
@@ -455,96 +441,112 @@
                     htmlContent = `
     <h2 ${inlineH2} style="text-align:center;">Core Competencies</h2>
     <p style="text-align:center; margin-bottom: 2rem;">Master these three pillars to advance to the next level of certification.</p>
-    <div class="d2l-lyt-grid-3">
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <h3 ${inlineH3}>1. Discovery</h3>
-            <p>Learn how to identify needs, gather requirements, and establish project scope efficiently.</p>
+    <div ${fWrapStretch}>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <h3 ${inlineH3}>1. Discovery</h3>
+                <p style="margin:0;">Learn how to identify needs, gather requirements, and establish project scope efficiently.</p>
+            </div>
         </div>
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <h3 ${inlineH3}>2. Design</h3>
-            <p>Apply adult learning theories to structure engaging, accessible, and inclusive materials.</p>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <h3 ${inlineH3}>2. Design</h3>
+                <p style="margin:0;">Apply adult learning theories to structure engaging, accessible, and inclusive materials.</p>
+            </div>
         </div>
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <h3 ${inlineH3}>3. Deployment</h3>
-            <p>Execute launch strategies, monitor system analytics, and gather qualitative feedback.</p>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <h3 ${inlineH3}>3. Deployment</h3>
+                <p style="margin:0;">Execute launch strategies, monitor system analytics, and gather qualitative feedback.</p>
+            </div>
         </div>
     </div>`;
                     break;
                 case 'l4':
                     htmlContent = `
-    <div class="d2l-lyt-hero" ${inlineHero}>
+    <div ${inlineHero}>
         <h1 style="margin: 0 0 1rem 0; font-size: 2.25rem;">The Scientific Method</h1>
         <p style="font-size: 1.1rem; margin:0;">An empirical method of acquiring knowledge that has characterized the development of science.</p>
     </div>
-    <div class="d2l-lyt-grid-3">
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <img src="${placeImg}" alt="Observation" style="margin-bottom: 1rem;" />
-            <h3 ${inlineH3}>Observation</h3>
-            <p>Formulating a hypothesis based on empirical evidence and initial questions.</p>
+    <div ${fWrapStretch}>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <img src="${placeImg}" alt="Observation" style="max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 1rem; display: block;" />
+                <h3 ${inlineH3}>Observation</h3>
+                <p style="margin:0;">Formulating a hypothesis based on empirical evidence and initial questions.</p>
+            </div>
         </div>
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <img src="${placeImg}" alt="Experimentation" style="margin-bottom: 1rem;" />
-            <h3 ${inlineH3}>Experimentation</h3>
-            <p>Testing the hypothesis through rigorous, repeatable, and controlled experiments.</p>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <img src="${placeImg}" alt="Experimentation" style="max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 1rem; display: block;" />
+                <h3 ${inlineH3}>Experimentation</h3>
+                <p style="margin:0;">Testing the hypothesis through rigorous, repeatable, and controlled experiments.</p>
+            </div>
         </div>
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <img src="${placeImg}" alt="Analysis" style="margin-bottom: 1rem;" />
-            <h3 ${inlineH3}>Analysis</h3>
-            <p>Reviewing data to confirm or refute the hypothesis, leading to a conclusion.</p>
+        <div ${fCol3}>
+            <div ${inlineCard}>
+                <img src="${placeImg}" alt="Analysis" style="max-width: 100%; height: auto; border-radius: 4px; margin-bottom: 1rem; display: block;" />
+                <h3 ${inlineH3}>Analysis</h3>
+                <p style="margin:0;">Reviewing data to confirm or refute the hypothesis, leading to a conclusion.</p>
+            </div>
         </div>
     </div>`;
                     break;
                 case 'l5':
                     htmlContent = `
-    <div class="d2l-lyt-grid-2">
-        <div>
+    <div ${fWrapCenter}>
+        <div ${fCol2}>
             <h2 ${inlineH2}>Phase One: Planning</h2>
-            <p>The initial phase involves mapping out the entire curriculum. We must ensure that all stakeholders agree on the primary learning outcomes before drafting content.</p>
+            <p style="margin:0;">The initial phase involves mapping out the entire curriculum. We must ensure that all stakeholders agree on the primary learning outcomes before drafting content.</p>
         </div>
-        <div><img src="${placeImg}" alt="Planning phase" /></div>
+        <div ${fCol2}><img src="${placeImg}" alt="Planning phase" ${inlineImg} /></div>
     </div>
-    <div class="d2l-lyt-grid-2">
-        <div><img src="${placeImg}" alt="Execution phase" /></div>
-        <div>
+    <div ${fWrapCenter}>
+        <div ${fCol2}><img src="${placeImg}" alt="Execution phase" ${inlineImg} /></div>
+        <div ${fCol2}>
             <h2 ${inlineH2}>Phase Two: Execution</h2>
-            <p>Once the plan is approved, content creation begins. Subject matter experts and instructional designers collaborate to build out modules in the Brightspace LMS.</p>
+            <p style="margin:0;">Once the plan is approved, content creation begins. Subject matter experts and instructional designers collaborate to build out modules in the Brightspace LMS.</p>
         </div>
     </div>`;
                     break;
                 case 'l6':
                     htmlContent = `
-    <div class="d2l-lyt-sidebar-l">
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <h3 ${inlineH3}>In This Module</h3>
-            <ul style="padding-left: 1.25rem; margin-top: 0.5rem; line-height: 1.8;">
-                <li>Introduction</li>
-                <li>Key Terminology</li>
-                <li>Case Study A</li>
-                <li>Module Quiz</li>
-            </ul>
+    <div ${fWrapStretch}>
+        <div ${fAside}>
+            <div ${inlineCard}>
+                <h3 ${inlineH3}>In This Module</h3>
+                <ul style="padding-left: 1.25rem; margin-top: 0.5rem; margin-bottom:0; line-height: 1.8;">
+                    <li>Introduction</li>
+                    <li>Key Terminology</li>
+                    <li>Case Study A</li>
+                    <li>Module Quiz</li>
+                </ul>
+            </div>
         </div>
-        <div>
+        <div ${fMain}>
             <h2 ${inlineH2}>Main Content Area</h2>
             <p style="margin-bottom: 1rem;">This layout is excellent for longer modules where learners benefit from a constant reference point on the left side of their screen.</p>
-            <p style="margin-bottom: 1rem;">It functions beautifully on desktop monitors, and the CSS Grid automatically stacks the sidebar above the main content when viewed on mobile devices via the Pulse App.</p>
-            <img src="${placeImg}" alt="Content illustration" />
+            <p style="margin-bottom: 1rem;">The fluid inline flexbox grids automatically stack the sidebar above the main content when viewed on mobile devices via the Pulse App without requiring external CSS.</p>
+            <img src="${placeImg}" alt="Content illustration" ${inlineImg} />
         </div>
     </div>`;
                     break;
                 case 'l7':
                     htmlContent = `
-    <div class="d2l-lyt-sidebar-r">
-        <div>
+    <div ${fWrapStretch}>
+        <div ${fMain}>
             <h2 ${inlineH2}>Historical Context</h2>
             <p style="margin-bottom: 1rem;">Understanding the background of the era provides necessary context for the literature produced during this time. Authors were heavily influenced by political instability and economic shifts.</p>
-            <img src="${placeImg}" alt="Historical timeline" style="margin-bottom: 1rem;" />
-            <p>Read the provided excerpts carefully, noting the recurring themes of isolation and resilience.</p>
+            <img src="${placeImg}" alt="Historical timeline" ${inlineImg} style="max-width: 100%; height: auto; border-radius: 8px; display: block; margin-bottom: 1rem;" />
+            <p style="margin:0;">Read the provided excerpts carefully, noting the recurring themes of isolation and resilience.</p>
         </div>
-        <div class="d2l-lyt-card" ${inlineCard}>
-            <h3 ${inlineH3}>Resources</h3>
-            <p style="font-size: 0.9rem; margin-bottom: 1rem;">Download these documents before beginning the assignment.</p>
-            <a href="#" style="display:block; color: ${pColor}; font-weight: bold; margin-bottom: 0.5rem; text-decoration:none;">&#128196; Reading Guide (PDF)</a>
-            <a href="#" style="display:block; color: ${pColor}; font-weight: bold; text-decoration:none;">&#128202; Rubric (Docx)</a>
+        <div ${fAside}>
+            <div ${inlineCard}>
+                <h3 ${inlineH3}>Resources</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;">Download these documents before beginning the assignment.</p>
+                <a href="#" style="display:block; color: ${pColor}; font-weight: bold; margin-bottom: 0.5rem; text-decoration:none;">&#128196; Reading Guide (PDF)</a>
+                <a href="#" style="display:block; color: ${pColor}; font-weight: bold; text-decoration:none;">&#128202; Rubric (Docx)</a>
+            </div>
         </div>
     </div>`;
                     break;
@@ -552,13 +554,13 @@
                     htmlContent = `
     <h2 ${inlineH2} style="text-align:center;">Weekly Lecture Video</h2>
     <p style="text-align:center; margin-bottom: 2rem;">Please watch the 15-minute lecture covering chapters 4 and 5.</p>
-    <div class="d2l-lyt-video-wrap">
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Lecture Video"></iframe>
+    <div ${videoWrap}>
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Lecture Video" ${videoIframe}></iframe>
     </div>
-    <div class="d2l-lyt-card" ${inlineCard}>
+    <div ${inlineCard}>
         <h3 ${inlineH3}>Video Transcript & Notes</h3>
-        <p>A full transcript of this video is available in the module folder. Key takeaways include:</p>
-        <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+        <p style="margin-bottom: 0.5rem;">A full transcript of this video is available in the module folder. Key takeaways include:</p>
+        <ul style="padding-left: 1.5rem; margin-bottom: 0;">
             <li>The definition of asynchronous communication.</li>
             <li>Best practices for moderating discussion forums.</li>
             <li>Rubric design for peer assessments.</li>
@@ -567,20 +569,24 @@
                     break;
                 case 'l9':
                     htmlContent = `
-    <div style="text-align: center; max-width: 800px; margin: 0 auto 2rem auto;">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 2rem auto; box-sizing: border-box;">
         <h2 ${inlineH2}>Choose Your Path</h2>
-        <p>Depending on your track, please select one of the following assignments to complete for this week. You do not need to do both.</p>
+        <p style="margin:0;">Depending on your track, please select one of the following assignments to complete for this week. You do not need to do both.</p>
     </div>
-    <div class="d2l-lyt-grid-2">
-        <div class="d2l-lyt-card" style="background-color: ${pColor}; color: #fff; text-align: center; border-radius: 8px; padding: 2rem;">
-            <h3 ${inlineH3Wht}>Track A: Research</h3>
-            <p style="margin-bottom: 1.5rem;">Write a 5-page literature review on the topic.</p>
-            <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: #fff; color: ${pColor}; text-decoration: none; border-radius: 4px; font-weight: bold;">Go to Assignment A</a>
+    <div ${fWrapStretch}>
+        <div ${fCol2}>
+            <div style="background-color: ${pColor}; color: #fff; text-align: center; border-radius: 8px; padding: 2rem; box-sizing: border-box; height: 100%;">
+                <h3 ${inlineH3Wht}>Track A: Research</h3>
+                <p style="margin-bottom: 1.5rem;">Write a 5-page literature review on the topic.</p>
+                <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: #fff; color: ${pColor}; text-decoration: none; border-radius: 4px; font-weight: bold; box-sizing: border-box;">Go to Assignment A</a>
+            </div>
         </div>
-        <div class="d2l-lyt-card" style="background-color: ${sColor}; text-align: center; border: 2px solid ${pColor}; border-radius: 8px; padding: 2rem;">
-            <h3 ${inlineH3}>Track B: Practical</h3>
-            <p style="margin-bottom: 1.5rem;">Build a functioning prototype using the provided software.</p>
-            <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: ${pColor}; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold;">Go to Assignment B</a>
+        <div ${fCol2}>
+            <div style="background-color: ${sColor}; text-align: center; border: 2px solid ${pColor}; border-radius: 8px; padding: 2rem; box-sizing: border-box; height: 100%;">
+                <h3 ${inlineH3}>Track B: Practical</h3>
+                <p style="margin-bottom: 1.5rem;">Build a functioning prototype using the provided software.</p>
+                <a href="#" style="display: inline-block; padding: 0.75rem 1.5rem; background-color: ${pColor}; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; box-sizing: border-box;">Go to Assignment B</a>
+            </div>
         </div>
     </div>`;
                     break;
@@ -588,25 +594,25 @@
                     htmlContent = `
     <h2 ${inlineH2} style="text-align:center;">By The Numbers</h2>
     <p style="text-align:center; margin-bottom: 2rem;">A quick look at the impact of the program globally.</p>
-    <div class="d2l-lyt-grid-4">
-        <div>
+    <div ${fWrapCenter}>
+        <div ${fCol4}>
             <div style="font-size: 2.5rem; font-weight: 800; color: ${pColor}; margin-bottom: 0.5rem;">45K+</div>
             <div style="font-size: 0.9rem; font-weight: bold;">Active Students</div>
         </div>
-        <div>
+        <div ${fCol4}>
             <div style="font-size: 2.5rem; font-weight: 800; color: ${pColor}; margin-bottom: 0.5rem;">120</div>
             <div style="font-size: 0.9rem; font-weight: bold;">Countries Reached</div>
         </div>
-        <div>
+        <div ${fCol4}>
             <div style="font-size: 2.5rem; font-weight: 800; color: ${pColor}; margin-bottom: 0.5rem;">98%</div>
             <div style="font-size: 0.9rem; font-weight: bold;">Employment Rate</div>
         </div>
-        <div>
+        <div ${fCol4}>
             <div style="font-size: 2.5rem; font-weight: 800; color: ${pColor}; margin-bottom: 0.5rem;">$2M</div>
             <div style="font-size: 0.9rem; font-weight: bold;">Research Grants</div>
         </div>
     </div>
-    <div class="d2l-lyt-card" ${inlineCard}>
+    <div ${inlineCard}>
         <p style="margin:0; text-align: center; font-style: italic;">Data recorded as of Q4 2023. View the full methodology in the appendix.</p>
     </div>`;
                     break;
@@ -614,21 +620,21 @@
                     htmlContent = `
     <h2 ${inlineH2}>Project Milestones</h2>
     <p style="margin-bottom: 2rem;">Follow these chronological steps to successfully complete your capstone project.</p>
-    <div class="d2l-lyt-timeline" ${inlineTimeLine}>
-        <div class="d2l-lyt-timeline-item">
-            <style>.d2l-lyt-timeline-item:nth-child(1)::before { background-color: ${pColor}; }</style>
+    <div ${inlineTimeLine}>
+        <div style="position: relative; margin-bottom: 2rem; box-sizing: border-box;">
+            <div style="position: absolute; left: -2.1rem; top: 0.25rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: ${pColor};"></div>
             <h3 ${inlineH3}>Step 1: Proposal Submission</h3>
-            <p>Submit your 1-page proposal outlining your topic, research question, and methodology by Week 3.</p>
+            <p style="margin:0;">Submit your 1-page proposal outlining your topic, research question, and methodology by Week 3.</p>
         </div>
-        <div class="d2l-lyt-timeline-item">
-            <style>.d2l-lyt-timeline-item:nth-child(2)::before { background-color: ${pColor}; }</style>
+        <div style="position: relative; margin-bottom: 2rem; box-sizing: border-box;">
+            <div style="position: absolute; left: -2.1rem; top: 0.25rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: ${pColor};"></div>
             <h3 ${inlineH3}>Step 2: Draft Review</h3>
-            <p>Peer review sessions will occur in Week 7. You must have a rough draft completed to participate.</p>
+            <p style="margin:0;">Peer review sessions will occur in Week 7. You must have a rough draft completed to participate.</p>
         </div>
-        <div class="d2l-lyt-timeline-item">
-            <style>.d2l-lyt-timeline-item:nth-child(3)::before { background-color: ${pColor}; }</style>
+        <div style="position: relative; box-sizing: border-box;">
+            <div style="position: absolute; left: -2.1rem; top: 0.25rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: ${pColor};"></div>
             <h3 ${inlineH3}>Step 3: Final Presentation</h3>
-            <p>Defend your research in front of the panel during finals week. Dress professionally.</p>
+            <p style="margin:0;">Defend your research in front of the panel during finals week. Dress professionally.</p>
         </div>
     </div>`;
                     break;
@@ -636,29 +642,29 @@
                     htmlContent = `
     <h2 ${inlineH2}>Visual Artifacts</h2>
     <p style="margin-bottom: 1.5rem;">Examine these four primary sources carefully.</p>
-    <div class="d2l-lyt-grid-2" style="gap: 1rem;">
-        <div style="position: relative;">
-            <img src="${placeImg}" alt="Artifact 1" />
-            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">Artifact A: The Charter</div>
+    <div ${fWrapStretch} style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 2rem; box-sizing: border-box;">
+        <div ${fCol2} style="flex: 1 1 calc(50% - 0.5rem); min-width: 250px; position: relative; box-sizing: border-box;">
+            <img src="${placeImg}" alt="Artifact 1" ${inlineImg} />
+            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-sizing: border-box;">Artifact A: The Charter</div>
         </div>
-        <div style="position: relative;">
-            <img src="${placeImg}" alt="Artifact 2" />
-            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">Artifact B: Map of the Region</div>
+        <div ${fCol2} style="flex: 1 1 calc(50% - 0.5rem); min-width: 250px; position: relative; box-sizing: border-box;">
+            <img src="${placeImg}" alt="Artifact 2" ${inlineImg} />
+            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-sizing: border-box;">Artifact B: Map of the Region</div>
         </div>
-        <div style="position: relative;">
-            <img src="${placeImg}" alt="Artifact 3" />
-            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">Artifact C: Portrait</div>
+        <div ${fCol2} style="flex: 1 1 calc(50% - 0.5rem); min-width: 250px; position: relative; box-sizing: border-box;">
+            <img src="${placeImg}" alt="Artifact 3" ${inlineImg} />
+            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-sizing: border-box;">Artifact C: Portrait</div>
         </div>
-        <div style="position: relative;">
-            <img src="${placeImg}" alt="Artifact 4" />
-            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">Artifact D: Ledger</div>
+        <div ${fCol2} style="flex: 1 1 calc(50% - 0.5rem); min-width: 250px; position: relative; box-sizing: border-box;">
+            <img src="${placeImg}" alt="Artifact 4" ${inlineImg} />
+            <div style="position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); color: #fff; padding: 0.75rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-sizing: border-box;">Artifact D: Ledger</div>
         </div>
     </div>`;
                     break;
             }
 
-            // --- 3. COMBINE AND OUTPUT ---
-            const fullOutput = `${cssBlock}\n<div class="d2l-lyt-wrapper" ${inlineWrap}>\n${htmlContent}\n</div>`;
+            // --- 3. COMBINE AND OUTPUT (100% INLINE BODY CONTENT ONLY) ---
+            const fullOutput = `<div ${inlineWrap}>\n${htmlContent}\n</div>`;
 
             // Set Textarea Code
             document.getElementById('codeOutput').value = fullOutput;
