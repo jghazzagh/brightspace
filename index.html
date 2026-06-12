@@ -229,7 +229,7 @@
             <div id="tab-instructions" class="tab-content scrollable">
                 <div class="instructions-content">
                     <h2>Integrating with D2L Brightspace</h2>
-                    <p>This layout generator is specifically engineered to bypass Brightspace's HTML sanitizers. It uses inline CSS for colors/fonts and scoped classes for structural grids, ensuring it renders perfectly on both desktop and the Pulse mobile app.</p>
+                    <p>This layout generator is specifically engineered to bypass Brightspace's HTML sanitizers. It uses <strong>inline CSS</strong> for colors and fonts, and scoped classes for structural grids, ensuring it renders perfectly on both desktop and the Pulse mobile app.</p>
                     
                     <h3>Step-by-Step Guide</h3>
                     <ol>
@@ -378,7 +378,7 @@
             updateBadge('badge-wht-pri', 'ratio-wht-pri', getContrastRatio('#ffffff', pColor), 'large');
 
             // --- 1. SCOPED STRUCTURAL CSS (Safe for Brightspace Body) ---
-            // Only structural layout (grid/flex/media queries). All colors are inline.
+            // Only structural layout (grid/flex/media queries). All colors and typography are inline.
             let cssBlock = `
 <style>
 .d2l-lyt-wrapper { max-width: 1200px; margin: 0 auto; padding: 15px; box-sizing: border-box; line-height: 1.6; }
@@ -407,7 +407,7 @@
 `;
 
             // --- 2. HTML CONTENT GENERATOR (Aggressive Inline CSS) ---
-            // Helper strings to keep code clean
+            // Helper strings to keep code clean and highly customizable via inline CSS
             const inlineWrap = `style="font-family: ${font}; color: ${tColor};"`;
             const inlineHero = `style="background-color: ${pColor}; color: #ffffff;"`;
             const inlineCard = `style="background-color: ${sColor}; border: 1px solid #e5e7eb;"`;
@@ -415,7 +415,6 @@
             const inlineH3 = `style="color: ${pColor}; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem;"`;
             const inlineH3Wht = `style="color: #ffffff; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem;"`;
             const inlineTimeLine = `style="border-color: ${pColor};"`;
-            const inlineTimeLineDot = `style="background-color: ${pColor};"`;
 
             let htmlContent = '';
 
@@ -544,8 +543,8 @@
         <div class="d2l-lyt-card" ${inlineCard}>
             <h3 ${inlineH3}>Resources</h3>
             <p style="font-size: 0.9rem; margin-bottom: 1rem;">Download these documents before beginning the assignment.</p>
-            <a href="#" style="display:block; color: ${pColor}; font-weight: bold; margin-bottom: 0.5rem;">&#128196; Reading Guide (PDF)</a>
-            <a href="#" style="display:block; color: ${pColor}; font-weight: bold;">&#128202; Rubric (Docx)</a>
+            <a href="#" style="display:block; color: ${pColor}; font-weight: bold; margin-bottom: 0.5rem; text-decoration:none;">&#128196; Reading Guide (PDF)</a>
+            <a href="#" style="display:block; color: ${pColor}; font-weight: bold; text-decoration:none;">&#128202; Rubric (Docx)</a>
         </div>
     </div>`;
                     break;
@@ -664,11 +663,16 @@
             // Set Textarea Code
             document.getElementById('codeOutput').value = fullOutput;
 
-            // Update Live Preview safely
+            // Update Live Preview safely via srcdoc
             const iframeDoc = `
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Preview</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Preview</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;600;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+                </head>
                 <body style="margin:0; padding:20px; background:#fff;">
                     ${fullOutput}
                 </body>
