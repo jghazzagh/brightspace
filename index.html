@@ -10,8 +10,8 @@
       --panel-bg: #ffffff;
       --border: #d9dee7;
       --border-soft: #eef1f5;
-      --primary: #0056b3;
-      --primary-dark: #003f85;
+      --primary: #003366;
+      --primary-dark: #001B3B;
       --text: #1f2937;
       --muted: #5f6b7a;
       --success: #166534;
@@ -99,9 +99,11 @@
     }
 
     .brand p {
-      margin: 2px 0 0;
+      margin: 4px 0 0;
       color: var(--muted);
-      font-size: 0.83rem;
+      font-size: 0.86rem;
+      line-height: 1.4;
+      max-width: 920px;
     }
 
     .header-actions {
@@ -647,12 +649,10 @@
       <div class="brand-mark" aria-hidden="true">B</div>
       <div>
         <h1>Brightspace HTML Page Builder</h1>
-        <p>Build body-safe, responsive, inline-styled course page layouts.</p>
+        <p>Build responsive, Brightspace-ready course page layouts. To use it: customize the page, open <strong>Brightspace code</strong>, copy the output, then paste it into the Brightspace HTML/source editor.</p>
       </div>
     </div>
     <div class="header-actions">
-      <span class="status-pill">Body-only output</span>
-      <span class="status-pill">No sidebar layouts</span>
       <button class="btn secondary small" type="button" id="resetBtn">Reset</button>
     </div>
   </header>
@@ -775,7 +775,7 @@ Submit your work before the deadline.</textarea>
         <div class="section-body">
           <div class="field">
             <label for="videoUrl">Video embed URL</label>
-            <input id="videoUrl" type="url" value="https://www.youtube.com/embed/VIDEO_ID" />
+            <input id="videoUrl" type="url" value="https://www.youtube.com/watch?v=ZZ5LpwO-An4&amp;t=2s" />
             <p class="help">Use the embed URL, not the regular watch URL.</p>
           </div>
 
@@ -812,11 +812,12 @@ Submit your work before the deadline.</textarea>
           <div class="field">
             <label for="themePreset">Theme preset</label>
             <select id="themePreset">
-              <option value="mccBlue">MCC-style blue</option>
+              <option value="mccBlueOrange" selected>MCC blue + orange, default</option>
+              <option value="mccNavyGold">MCC navy + gold</option>
+              <option value="mccTealBlue">MCC teal + light blue</option>
+              <option value="mccOrangeNavy">MCC orange + navy</option>
+              <option value="mccBrightBlue">MCC bright blue + orange</option>
               <option value="slate">Modern slate</option>
-              <option value="teal">Soft teal</option>
-              <option value="purple">Academic purple</option>
-              <option value="warm">Warm neutral</option>
               <option value="highContrast">High contrast</option>
               <option value="custom">Custom</option>
             </select>
@@ -825,46 +826,48 @@ Submit your work before the deadline.</textarea>
           <div class="field">
             <label for="primaryColorText">Primary color</label>
             <div class="color-row">
-              <input type="color" id="primaryColorPicker" value="#0056b3" />
-              <input type="text" id="primaryColorText" value="#0056b3" pattern="^#[0-9A-Fa-f]{6}$" />
+              <input type="color" id="primaryColorPicker" value="#003366" />
+              <input type="text" id="primaryColorText" value="#003366" pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
           <div class="field">
             <label for="secondaryColorText">Card/background color</label>
             <div class="color-row">
-              <input type="color" id="secondaryColorPicker" value="#f8f9fa" />
-              <input type="text" id="secondaryColorText" value="#f8f9fa" pattern="^#[0-9A-Fa-f]{6}$" />
+              <input type="color" id="secondaryColorPicker" value="#D6E8EE" />
+              <input type="text" id="secondaryColorText" value="#D6E8EE" pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
           <div class="field">
             <label for="textColorText">Main text color</label>
             <div class="color-row">
-              <input type="color" id="textColorPicker" value="#202124" />
-              <input type="text" id="textColorText" value="#202124" pattern="^#[0-9A-Fa-f]{6}$" />
+              <input type="color" id="textColorPicker" value="#001B3B" />
+              <input type="text" id="textColorText" value="#001B3B" pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
           <div class="field">
             <label for="accentColorText">Accent/callout color</label>
             <div class="color-row">
-              <input type="color" id="accentColorPicker" value="#0f766e" />
-              <input type="text" id="accentColorText" value="#0f766e" pattern="^#[0-9A-Fa-f]{6}$" />
+              <input type="color" id="accentColorPicker" value="#FF6600" />
+              <input type="text" id="accentColorText" value="#FF6600" pattern="^#[0-9A-Fa-f]{6}$" />
             </div>
           </div>
 
           <div class="field">
             <label for="fontStack">Font stack</label>
             <select id="fontStack">
-              <option value='"Lato", Arial, sans-serif' selected>Lato if available in Brightspace</option>
+              <option value='"Lato", Arial, sans-serif' selected>Lato</option>
+              <option value='"Poppins", Arial, sans-serif'>Poppins, MCC-approved Mazzard H alternative</option>
+              <option value='"Mazzard H", "Poppins", Arial, sans-serif'>Mazzard H, official MCC typeface</option>
               <option value='system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'>System UI / Segoe UI</option>
               <option value='Arial, Helvetica, sans-serif'>Arial / Helvetica</option>
               <option value='Verdana, Geneva, sans-serif'>Verdana</option>
               <option value='"Trebuchet MS", Arial, sans-serif'>Trebuchet MS</option>
               <option value='Georgia, "Times New Roman", serif'>Georgia Serif</option>
             </select>
-            <p class="help">Lato is selected by default. If Brightspace does not load Lato, the page will fall back to Arial.</p>
+            <p class="help"><strong>Preview note:</strong> some fonts may not appear correctly in the preview because they are not loaded into this browser page. They may still display correctly in Brightspace when those fonts are available there.</p>
           </div>
 
           <div class="field">
@@ -965,11 +968,12 @@ Submit your work before the deadline.</textarea>
     "use strict";
 
     const themes = {
-      mccBlue: { primary: "#0056b3", secondary: "#f8f9fa", text: "#202124", accent: "#0f766e" },
+      mccBlueOrange: { primary: "#003366", secondary: "#D6E8EE", text: "#001B3B", accent: "#FF6600" },
+      mccNavyGold: { primary: "#001B3B", secondary: "#F7B32B", text: "#001B3B", accent: "#003366" },
+      mccTealBlue: { primary: "#008DA7", secondary: "#D6E8EE", text: "#001B3B", accent: "#003366" },
+      mccOrangeNavy: { primary: "#FF6600", secondary: "#FFF3EA", text: "#001B3B", accent: "#003366" },
+      mccBrightBlue: { primary: "#33A1FD", secondary: "#EAF5FF", text: "#001B3B", accent: "#FF6600" },
       slate: { primary: "#334155", secondary: "#f8fafc", text: "#111827", accent: "#2563eb" },
-      teal: { primary: "#0f766e", secondary: "#ecfdf5", text: "#164e63", accent: "#0369a1" },
-      purple: { primary: "#5b21b6", secondary: "#f5f3ff", text: "#1f2937", accent: "#7c3aed" },
-      warm: { primary: "#9a3412", secondary: "#fff7ed", text: "#292524", accent: "#b45309" },
       highContrast: { primary: "#000000", secondary: "#ffffff", text: "#000000", accent: "#1d4ed8" }
     };
 
@@ -1301,6 +1305,61 @@ Submit your work before the deadline.</textarea>
       if (/^(https?:\/\/|\/|#|mailto:|tel:)/i.test(raw)) {
         return escapeAttr(raw);
       }
+
+    function toEmbedUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw || raw === "#") return "#";
+
+      try {
+        const url = new URL(raw);
+        const host = url.hostname.replace(/^www\./, "");
+
+        if (host === "youtube.com" || host === "m.youtube.com") {
+          if (url.pathname === "/watch") {
+            const videoId = url.searchParams.get("v");
+            if (videoId) {
+              const start = url.searchParams.get("t");
+              let embed = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+              if (start) {
+                const seconds = parseYouTubeTime(start);
+                if (seconds > 0) embed += `?start=${seconds}`;
+              }
+              return embed;
+            }
+          }
+
+          if (url.pathname.startsWith("/embed/")) {
+            return raw;
+          }
+        }
+
+        if (host === "youtu.be") {
+          const videoId = url.pathname.replace("/", "");
+          if (videoId) {
+            const start = url.searchParams.get("t");
+            let embed = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`;
+            if (start) {
+              const seconds = parseYouTubeTime(start);
+              if (seconds > 0) embed += `?start=${seconds}`;
+            }
+            return embed;
+          }
+        }
+
+        return raw;
+      } catch {
+        return "#";
+      }
+    }
+
+    function parseYouTubeTime(value) {
+      const time = String(value || "").toLowerCase().trim();
+      if (/^\d+$/.test(time)) return Number(time);
+      const h = Number((time.match(/(\d+)h/) || [0, 0])[1]);
+      const m = Number((time.match(/(\d+)m/) || [0, 0])[1]);
+      const s = Number((time.match(/(\d+)s/) || [0, 0])[1]);
+      return h * 3600 + m * 60 + s;
+    }
       return fallback;
     }
 
@@ -1434,10 +1493,10 @@ Submit your work before the deadline.</textarea>
 
     function getConfig() {
       return {
-        primary: isValidHex(dom.primaryText.value) ? dom.primaryText.value : "#0056b3",
-        secondary: isValidHex(dom.secondaryText.value) ? dom.secondaryText.value : "#f8f9fa",
-        text: isValidHex(dom.textText.value) ? dom.textText.value : "#202124",
-        accent: isValidHex(dom.accentText.value) ? dom.accentText.value : "#0f766e",
+        primary: isValidHex(dom.primaryText.value) ? dom.primaryText.value : "#003366",
+        secondary: isValidHex(dom.secondaryText.value) ? dom.secondaryText.value : "#D6E8EE",
+        text: isValidHex(dom.textText.value) ? dom.textText.value : "#001B3B",
+        accent: isValidHex(dom.accentText.value) ? dom.accentText.value : "#FF6600",
         font: dom.font.value,
         bodyFontSize: dom.bodyFontSize.value || "19px",
         fontScope: dom.fontScope.value || "all",
@@ -1457,7 +1516,7 @@ Submit your work before the deadline.</textarea>
         calloutTitle: escapeHtml(dom.calloutTitle.value),
         calloutText: escapeHtml(dom.calloutText.value),
         checklistItems: getChecklistLines(dom.checklistItems.value),
-        videoUrl: sanitizeUrl(dom.videoUrl.value, "#"),
+        videoUrl: sanitizeUrl(toEmbedUrl(dom.videoUrl.value), "#"),
         videoTitle: escapeAttr(dom.videoTitle.value || "Course video"),
         transcriptUrl: sanitizeUrl(dom.transcriptUrl.value, "#"),
         transcriptText: escapeHtml(dom.transcriptText.value || "Open the video transcript"),
@@ -1810,13 +1869,6 @@ Submit your work before the deadline.</textarea>
         status: fontAppliedToText ? "pass" : "warn"
       });
 
-      const hasSidebarName = /sidebar/i.test(c.layout);
-      checks.push({
-        title: "No sidebar layout",
-        text: hasSidebarName ? "A sidebar layout is selected." : "This builder does not include sidebar layouts.",
-        status: hasSidebarName ? "fail" : "pass"
-      });
-
       return checks;
     }
 
@@ -1886,8 +1938,8 @@ ${output}
 
     function resetBuilder() {
       dom.purpose.value = "weeklyOverview";
-      dom.themePreset.value = "mccBlue";
-      applyTheme("mccBlue");
+      dom.themePreset.value = "mccBlueOrange";
+      applyTheme("mccBlueOrange");
       applyPurposePreset("weeklyOverview");
       dom.font.value = '"Lato", Arial, sans-serif';
       dom.bodyFontSize.value = "19px";
@@ -1901,7 +1953,7 @@ ${output}
       dom.calloutTitle.value = "Success Tip";
       dom.calloutText.value = "Start with the checklist, then work through the module from top to bottom. This helps you stay organized and avoid missing important steps.";
       dom.checklistItems.value = "Read the overview.\nComplete the required content.\nParticipate in the learning activity.\nSubmit your work before the deadline.";
-      dom.videoUrl.value = "https://www.youtube.com/embed/VIDEO_ID";
+      dom.videoUrl.value = "https://www.youtube.com/watch?v=ZZ5LpwO-An4&t=2s";
       dom.videoTitle.value = "Course lecture video";
       dom.transcriptUrl.value = "#";
       dom.transcriptText.value = "Open the video transcript";
@@ -1969,4 +2021,3 @@ ${output}
   </script>
 </body>
 </html>
-
